@@ -11,11 +11,29 @@ bp = Blueprint('choose', __name__)
 @login_required
 def choose(answerId):
     db = get_db()
-    db.execute(
-        'INSERT INTO choose (user_id, answer_id)'
-        ' VALUES (?, ?)',
-        (g.user['user_id'], answerId)
-    )
+    error = None
+
+    questionID = db.execute(
+        'SELECT question_id from answer where answer_id = ?;',
+        (answerId,)
+    ).fetchone()['question_id']
+
+    if db.execute(
+            'SELECT c.user_id'
+            ' FROM answer a join choose c on (a.answer_id = c.answer_id)'
+            ' where c.user_id = ? AND ? = a.question_id',
+        (g.user['user_id'], questionID)
+        ).fetchone() is not None:
+        error = "You've already voted for that question!"
+
+    if error is not None:
+        flash(error)
+    else:   
+        db.execute(
+            'INSERT INTO choose (user_id, answer_id)'
+            ' VALUES (?, ?)',
+            (g.user['user_id'], answerId)
+        )
     
     questionId = db.execute(
         'SELECT question_id'

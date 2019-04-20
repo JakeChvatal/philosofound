@@ -6,10 +6,13 @@ from flaskr.auth import login_required
 from flaskr.db import get_db
 
 bp = Blueprint('answer', __name__)
-@bp.route('/<int:questionId>', methods = ('GET',))
+@bp.route('/<int:questionId>', methods = ('POST','GET'))
 @login_required
 def index(questionId):
     db = get_db()
+    demographic = request.form['demographic']
+    demographic_info = None
+    
     chosen_answer = db.execute(
         'SELECT a.answer_id'
         ' FROM answer a JOIN choose c on(a.answer_id = c.answer_id)'
@@ -30,10 +33,11 @@ def index(questionId):
         ' WHERE a.question_id = ?;',
         (question['question_id'],)
     )
-
-    return render_template('answer/index.html', question = question, answers = answers)
-
     
+    if demographic is not None and demographic != "Choose an option...":
+        demographic_info = get_demographic_info(chosen_answer, demographic)
+
+    return render_template('answer/index.html', question = question, answers = answers, demographic_info = demographic_info)
 
 def get_demographic_info(answerId, demographic):
     db = get_db()
@@ -73,7 +77,7 @@ def create(questionId):
     ).fetchone()
 
     if duplicate_answer is not None:
-        error = "This answer already exists! Vote for that answer."
+        error = "This answer already exists for this question! Vote for that answer."
 
     if error is not None:
         flash(error)

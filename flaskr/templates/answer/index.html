@@ -12,8 +12,31 @@
     <article class="question">
         <header>
             <div><h1>{{question['text'] }}</h1>
+                
                 {% for answer in answers %}
                     <h2>{{answer['text'] }}</h2>
+                    <form id="demographic" name="demographic">
+                        <label for="demographic">Select a Demographic for Above Answer</label>
+                        <select name="demographic" id="demographic">
+                            <option>Choose an option...</option>
+                            <option>gender</option>
+                            <option>income</option>
+                            <option>party</option>
+                            <option>geography</option>
+                        </select>   
+                        <input type="submit" value="View" action="{{ url_for('answer.index', questionId=question['question_id']) }}" method="POST">
+                    </form>
+                    {% if demographic_info != None %}
+                        <tr>
+                        {% for demo in demographic_info %}
+                            <td>{{ demo['num_responses'] }}</td>
+                            <td>{{ demo['num_chose'] }}</td>
+                            <td>{{ demo['percent_chose'] }}</td>
+                        {% endfor %}
+                        </tr>
+                    {% else %}
+                        <h2>Didn't work</h2>
+                    {% endif %}
                 {% endfor %}
             </div>
         </header>
