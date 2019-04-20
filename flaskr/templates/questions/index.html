@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+<!-- when user is logged in, link is available to create a question-->
+{% block header %}
+    <h1>{% block title %}Questions{% endblock %}</h1>
+    {% if g.user %}
+        <a class="action" href="{{ url_for('question.create') }}">New</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <article class="question">
+        <header>
+            <div>
+                <h1>{{question['question'] }}</h1>
+                <form action="{{ url_for('answer.create', questionId=question['id']) }}" method="post">
+                    <input name="answer" id="answer" value="{{ request.form['answer'] }}" required>
+                    <input type="submit" value="Add Answer">
+                </form>
+            </div>
+        </header>
+    </article>
+{% endblock %}

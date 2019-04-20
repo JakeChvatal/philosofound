@@ -22,26 +22,23 @@ def create_app(test_config=None):
     else:
         app.config.from_mapping(test_config)
 
+    #ensures app.instance_path exists for db to be made
     try:
-
-        #ensures app.instance_path exists for db
         os.makedirs(app.instance_path)
     except OSError:
         pass
     
-    # creates a route for the app
-    @app.route('/hello')
-    def hello():
-        return 'hello world!'
-    
+    # creates a route for the app  
     from . import db
     db.init_app(app)
 
     from . import auth
     app.register_blueprint(auth.bp)
 
-    from . import blog
-    app.register_blueprint(blog.bp)
+    from . import question
+    app.register_blueprint(question.bp)
     app.add_url_rule('/', endpoint='index')
 
+    from . import answer
+    app.register_blueprint(answer.bp)
     return app

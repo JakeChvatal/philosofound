@@ -21,7 +21,7 @@ CREATE TABLE answer (
   answer VARCHAR(250) NOT NULL,
   question_id INTEGER NOT NULL,
   author_id INTEGER NOT NULL,
-  FOREIGN KEY (question_id) references user(id),
+  FOREIGN KEY (question_id) references question(id),
   FOREIGN KEY (author_id) references user(id)
 );
 
