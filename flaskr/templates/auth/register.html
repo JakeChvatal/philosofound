@@ -10,6 +10,51 @@
     <input name="username" id="username" required>
     <label for="password">Password</label>
     <input type="password" name="password" id="password" required>
+
+    <label for="username">Gender</label>
+    <select name="gender" id="gender" required>
+      <option>Choose an option...</option>
+      <option>Female</option>
+      <option>Male</option>
+      <option>Non-Binary</option>
+      <option>Other</option>
+    </select>
+    <br>
+
+    <label for="income">Income</label>
+    <select name="income" id="income" required>
+      <option>Choose an option...</option>
+      <option>0 - 25,000 USD</option>
+      <option>25,000 USD - 50,000 USD</option>
+      <option>50,000 USD - 75,000 USD</option>
+      <option>75,000 USD - 100,000 USD</option>
+      <option>100,000 USD - 200,000 USD</option>
+      <option>200,000+ USD</option>
+    </select>
+    <br>
+
+    <label for="party">Political Party</label>
+    <select name="party" id="party" required>
+      <option>Choose an option...</option>
+      <option>Democrat</option>
+      <option>Republican</option>
+      <option>Independent</option>
+      <option>Other</option>
+    </select>
+    <br>
+
+    <label for="geography">Geography</label>
+    <select name="geography" id="geography" required>
+      <option>Choose an option...</option>
+      <option>West Coast US</option>
+      <option>Midwestern US</option>
+      <option>Southern US</option>
+      <option>East Coast US</option>
+      <option>Outside Territories</option>
+      <option>Non-US</option>
+    </select>
+    <br>
+    
     <input type="submit" value="Register">
   </form>
 {% endblock %}

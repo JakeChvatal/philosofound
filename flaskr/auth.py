@@ -13,6 +13,11 @@ def register():
         # request.form is dict mapping for form keys and values
         username = request.form['username']
         password = request.form['password']
+        gender = request.form['gender']
+        income = request.form['income']
+        party = request.form['party']
+        geography = request.form['geography']
+        
         db = get_db()
         error = None
 
@@ -21,6 +26,14 @@ def register():
             error = 'Username is required.'
         elif not password:
             error = 'Password is required.'
+        elif gender == "Choose an option...":
+            error = 'Gender is required.'
+        elif income == "Choose an option...":
+            error = 'Income is required.'
+        elif party == "Choose an option...":
+            error = 'Party is required.'
+        elif geography == "Choose an option...":
+            error = "Geography is required."
         elif db.execute(
             'SELECT user_id FROM user WHERE username = ?', (username,)
             # fetchone gets first row of the query
@@ -28,12 +41,13 @@ def register():
             #.format inserts things in order into curly braces
             error = 'User {} is already registered.'.format(username)
         
+        
         # add user to database if there is no error
         if error is None:
             # add username and securely hashed password to db
             db.execute(
-                'INSERT INTO user (username, password) VALUES (?, ?)',
-                (username, generate_password_hash(password))
+                'INSERT INTO user (username, password, gender, income, party, geography) VALUES (?, ?, ?, ?, ?, ?)',
+                (username, generate_password_hash(password), gender, income, party, geography)
             )
             db.commit()
             # generates redirect response for the url (???)

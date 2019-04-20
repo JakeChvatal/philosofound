@@ -5,11 +5,11 @@ CREATE TABLE user (
   user_id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
-  u_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP --,
-   -- gender TEXT CHECK( gender IN ('M', 'F', 'non binary', 'other') ) DEFAULT 'not specified',
-   -- income TEXT CHECK( income IN ('0-25k', '26-50k', '51-75k', '76-100k', '101k+')) DEFAULT 'not specified',
-   -- party TEXT CHECK( party IN ('red', 'blue', 'ind', 'other')) DEFAULT 'not specified',
-   -- geography TEXT CHECK( geography IN ('west coast', 'east coast', 'midwest', 'south', 'outside territories', 'non-us')) DEFAULT 'not specified'
+  u_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  gender TEXT CHECK( gender IN ('Female', 'Male', 'Non-Binary', 'Other') ) DEFAULT 'not specified',
+  income TEXT CHECK( income IN ('0 - 25,000 USD', '25,000 USD - 50,000 USD', '50,000 USD - 75,000 USD', '75,000 USD - 100,000 USD', '100,000 USD - 200,000 USD', '200,000+ USD')) DEFAULT 'not specified',
+  party TEXT CHECK( party IN ('Democrat', 'Republican', 'Independent', 'Other')) DEFAULT 'not specified',
+  geography TEXT CHECK( geography IN ('West Coast US', 'Midwestern US', 'Southern US', 'East Coast US', 'Outside Territories', 'Non-US')) DEFAULT 'not specified'
 );
 
 DROP TABLE IF EXISTS question;

@@ -12,6 +12,7 @@ bp = Blueprint('answer', __name__)
 def create(questionId):
     answer_text = request.form['answer_text']
     error = None
+    db = get_db()
 
     # errors if a question is not supplied
     if not answer_text:
@@ -19,9 +20,9 @@ def create(questionId):
     
     duplicate_answer = db.execute(
         'SELECT *'
-        ' FROM question'
-        ' WHERE question.text = ?',
-        (question_text,)
+        ' FROM answer'
+        ' WHERE answer.question_id = ? AND answer.text = ?;',
+        (questionId, answer_text,)
     ).fetchone()
 
     if duplicate_answer is not None:
@@ -32,7 +33,6 @@ def create(questionId):
 
     # if no error, adds an answer to the database
     else:
-        db = get_db()
 
         # creates a new answer
         db.execute(
@@ -57,4 +57,4 @@ def create(questionId):
         
         db.commit()
         # TODO: redirect to answer page, not questions
-        return redirect(url_for('question.index'))
+    return redirect(url_for('question.index'))
