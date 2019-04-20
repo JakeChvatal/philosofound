@@ -16,6 +16,9 @@
                     <h1>{{question['question'] }}</h1>
                     {% for answer in answers %}
                         <h2>{{answer['answer'] }}</h2>
+                        <form action="{{ url_for('vote.vote', answerId=answer['id']) }}" method="post">
+                            <input type="submit" value="Vote for this answer">
+                        </form>
                     {% endfor %}
                     <form action="{{ url_for('answer.create', questionId=question['id']) }}" method="post">
                         <input name="answer" id="answer" value="{{ request.form['answer'] }}" required>

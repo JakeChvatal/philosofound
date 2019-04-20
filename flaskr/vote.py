@@ -7,26 +7,15 @@ from flaskr.db import get_db
 
 bp = Blueprint('vote', __name__)
 
-@bp.route('/vote', methods=('POST', 'FAKE'))
+@bp.route('/<int:answerId>/vote', methods=('POST',))
 @login_required
-def vote():
-    answer = request.form['answer']
-    error = None
+def vote(answerId):
 
-    # errors if a question is not supplied
-    if not question:
-        error = 'Question is required.'
-    
-    if error is not None:
-        flash(error)
-
-    # if no error, adds a question to the database
-    else:
-        db = get_db()
-        db.execute(
-            'INSERT INTO question (question, author_id)'
-            ' VALUES (?, ?)',
-            (question, g.user['id'])
-        )
-        db.commit()
-        return redirect(url_for('question.index'))
+    db = get_db()
+    db.execute(
+        'INSERT INTO vote (user_id, answer_id)'
+        ' VALUES (?, ?)',
+        (g.user['id'], answerId)
+    )
+    db.commit()
+    return redirect(url_for('question.index'))
