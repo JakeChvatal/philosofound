@@ -125,4 +125,3 @@ def login_required(view):
  # url_for():generates URL for view based on name and args
  # 'endpoint', same name as view function by default
  # when using a blueprint: name of blueprint is prepended to name of function
-

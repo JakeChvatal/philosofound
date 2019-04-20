@@ -4,7 +4,7 @@
 {% block header %}
     <h1>{% block title %}Questions{% endblock %}</h1>
     {% if g.user %}
-        <a class="action" href="{{ url_for('question.create') }}">New</a>
+        <a class="action" href="{{ url_for('question.create') }}">Ask a Question</a>
     {% endif %}
 {% endblock %}
 
