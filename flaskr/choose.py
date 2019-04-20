@@ -14,7 +14,7 @@ def choose(answerId):
     db.execute(
         'INSERT INTO choose (user_id, answer_id)'
         ' VALUES (?, ?)',
-        (g.user['id'], answerId)
+        (g.user['user_id'], answerId)
     )
     db.commit()
     return redirect(url_for('question.index'))

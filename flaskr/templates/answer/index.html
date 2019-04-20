@@ -5,9 +5,9 @@
         <header>
             <div>
                 {% if answers != none %}
-                    <h1>{{question['question'] }}</h1>
+                    <h1>{{question['text'] }}</h1>
                     {% for answer in answers_analytics %}
-                        <h2>{{answer['answer'] }}</h2>
+                        <h2>{{answer['text'] }}</h2>
                  <!--   this will display some answer analytics    <h3>{{answer[''] }}</h3>--> 
                     {% endfor %}    
                 {% else %}

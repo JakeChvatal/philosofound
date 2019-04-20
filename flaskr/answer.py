@@ -10,13 +10,23 @@ bp = Blueprint('answer', __name__)
 @bp.route('/<int:questionId>/createAnswer', methods=('POST',))
 @login_required
 def create(questionId):
-    answer = request.form['answer']
+    answer_text = request.form['answer_text']
     error = None
 
     # errors if a question is not supplied
-    if not answer:
+    if not answer_text:
         error = 'Answer is required.'
     
+    duplicate_answer = db.execute(
+        'SELECT *'
+        ' FROM question'
+        ' WHERE question.text = ?',
+        (question_text,)
+    ).fetchone()
+
+    if duplicate_answer is not None:
+        error = "This answer already exists! Vote for that answer."
+
     if error is not None:
         flash(error)
 
@@ -26,16 +36,23 @@ def create(questionId):
 
         # creates a new answer
         db.execute(
-            'INSERT INTO answer (answer, question_id, author_id)'
+            'INSERT INTO answer (text, question_id, author_id)'
             ' VALUES (?, ?, ?)',
-            (answer, questionId, g.user['id'])
+            (answer_text, questionId, g.user['user_id'])
         )
+
+        answer_id = db.execute(
+            'SELECT answer.answer_id'
+            ' FROM answer'
+            ' WHERE answer.text = ? AND answer.question_id = ?',
+            (answer_text, questionId)
+        ).fetchone()['answer_id']
 
         # user automatically chooses an answer they create
         db.execute(
             'INSERT INTO choose (user_id, answer_id)'
             ' VALUES (?, ?)',
-            (g.user['id'], answer['id'])
+            (g.user['user_id'], answer_id)
         )
         
         db.commit()

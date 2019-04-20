@@ -13,14 +13,14 @@
         <header>
             <div>
                 {% if question != none and answers != none %}
-                    <h1>{{question['question'] }}</h1>
+                    <h1>{{question['text'] }}</h1>
                     {% for answer in answers %}
-                        <h2>{{answer['answer'] }}</h2>
-                        <form action="{{ url_for('choose.choose', answerId=answer['id']) }}" method="post">
+                        <h2>{{answer['text'] }}</h2>
+                        <form action="{{ url_for('choose.choose', answerId=answer['answer_id']) }}" method="post">
                             <input type="submit" value="Vote for this answer">
                         </form>
                     {% endfor %}
-                    <form action="{{ url_for('answer.create', questionId=question['id']) }}" method="post">
+                    <form action="{{ url_for('answer.create', questionId=question['question_id']) }}" method="post">
                         <input name="answer_text" id="answer_text" value="{{ request.form['answer_text'] }}" required>
                         <input type="submit" value="Add Answer">
                     </form>        
