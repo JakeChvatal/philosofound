@@ -19,8 +19,14 @@ def index():
         #(g.user['id'],)
     ).fetchone()
 
+    answers = db.execute(
+        'SELECT a.id, answer'
+        ' FROM answer a'
+        ' WHERE a.question_id = ?;',
+        (question['id'],)
+    )
 
-    return render_template('questions/index.html', question = question)
+    return render_template('questions/index.html', question = question, answers = answers)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
