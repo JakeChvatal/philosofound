@@ -12,14 +12,20 @@
     <article class="question">
         <header>
             <div>
-                <h1>{{question['question'] }}</h1>
-                {% for answer in answers %}
-                    <h2>{{answer['answer'] }}</h2>
-                {% endfor %}
-                <form action="{{ url_for('answer.create', questionId=question['id']) }}" method="post">
-                    <input name="answer" id="answer" value="{{ request.form['answer'] }}" required>
-                    <input type="submit" value="Add Answer">
-                </form>
+                {% if question != none and answers != none %}
+                    <h1>{{question['question'] }}</h1>
+                    {% for answer in answers %}
+                        <h2>{{answer['answer'] }}</h2>
+                    {% endfor %}
+                    <form action="{{ url_for('answer.create', questionId=question['id']) }}" method="post">
+                        <input name="answer" id="answer" value="{{ request.form['answer'] }}" required>
+                        <input type="submit" value="Add Answer">
+                    </form>        
+                {% else %}
+                    <h3>No more questions to answer.</h3>
+                    <h3>Check back later for more philoso-fun questions!</h3>
+                {% endif %}
+                
             </div>
         </header>
     </article>

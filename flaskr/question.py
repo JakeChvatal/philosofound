@@ -13,18 +13,21 @@ def index():
     db = get_db()
     # gets the questions a user hasn't answered yet
     question = db.execute(
-        'SELECT q.id, question' # a.id , a.answer'
-        ' FROM question q;' # JOIN answer a on a.question_id = q.id ',
-        #' WHERE v.user_id NOT LIKE ?' ;;;; JOIN vote v on a.id = v.answer_id;,
-        #(g.user['id'],)
+        'SELECT q.id, question, a.id, a.answer'
+        ' FROM question q LEFT JOIN answer a on a.question_id = q.id LEFT JOIN vote v on a.id = v.answer_id'
+        ' WHERE (v.user_id IS NULL OR v.user_id NOT LIKE ?) AND q.author_id NOT LIKE ? AND a.author_id NOT LIKE ?',
+        (g.user['id'], g.user['id'], g.user['id'])
     ).fetchone()
 
-    answers = db.execute(
-        'SELECT a.id, answer'
-        ' FROM answer a'
-        ' WHERE a.question_id = ?;',
-        (question['id'],)
-    )
+    answers = None
+
+    if question != None:
+        answers = db.execute(
+            'SELECT a.id, answer'
+            ' FROM answer a'
+            ' WHERE a.question_id = ?;',
+            (question['id'],)
+        )
 
     return render_template('questions/index.html', question = question, answers = answers)
 
