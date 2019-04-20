@@ -22,6 +22,10 @@ Define flask app as the flaskr folder
 Set environment as development
 ```set FLASK_ENV=development```
 
+
+Initialize the database
+```flask init-db```
+
 Run the application
 ```flask run```
 
