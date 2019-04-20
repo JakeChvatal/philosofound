@@ -5,15 +5,14 @@ import sys
 from flaskr.auth import login_required
 from flaskr.db import get_db
 
-bp = Blueprint('vote', __name__)
+bp = Blueprint('choose', __name__)
 
-@bp.route('/<int:answerId>/vote', methods=('POST',))
+@bp.route('/<int:answerId>/choose', methods=('POST',))
 @login_required
-def vote(answerId):
-
+def choose(answerId):
     db = get_db()
     db.execute(
-        'INSERT INTO vote (user_id, answer_id)'
+        'INSERT INTO choose (user_id, answer_id)'
         ' VALUES (?, ?)',
         (g.user['id'], answerId)
     )

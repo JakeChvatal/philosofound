@@ -7,7 +7,7 @@
 {% block content %}
     <form method="post">
         <label for="question">Question</label>
-        <input name="question" id="question" value="{{ request.form['question'] }}" required>
+        <input name="question_text" id="question_text" value="{{ request.form['question_text'] }}" required>
         <input type="submit" value="Save">
     </form>
 {% endblock %}

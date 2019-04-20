@@ -23,11 +23,21 @@ def create(questionId):
     # if no error, adds an answer to the database
     else:
         db = get_db()
+
+        # creates a new answer
         db.execute(
             'INSERT INTO answer (answer, question_id, author_id)'
             ' VALUES (?, ?, ?)',
             (answer, questionId, g.user['id'])
         )
 
+        # user automatically chooses an answer they create
+        db.execute(
+            'INSERT INTO choose (user_id, answer_id)'
+            ' VALUES (?, ?)',
+            (g.user['id'], answer['id'])
+        )
+        
         db.commit()
+        # TODO: redirect to answer page, not questions
         return redirect(url_for('question.index'))

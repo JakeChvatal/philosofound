@@ -39,8 +39,8 @@ def create_app(test_config=None):
     app.register_blueprint(question.bp)
     app.add_url_rule('/', endpoint='index')
 
-    from . import vote
-    app.register_blueprint(vote.bp)
+    from . import choose
+    app.register_blueprint(choose.bp)
 
     from . import answer
     app.register_blueprint(answer.bp)

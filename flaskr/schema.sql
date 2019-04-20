@@ -4,31 +4,40 @@ DROP TABLE IF EXISTS user;
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL
+  password TEXT NOT NULL,
+  u_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP --,
+   -- gender TEXT CHECK( gender IN ('M', 'F', 'non binary', 'other') ) DEFAULT 'not specified',
+   -- income TEXT CHECK( income IN ('0-25k', '26-50k', '51-75k', '76-100k', '101k+')) DEFAULT 'not specified',
+   -- party TEXT CHECK( party IN ('red', 'blue', 'ind', 'other')) DEFAULT 'not specified',
+   -- geography TEXT CHECK( geography IN ('west coast', 'east coast', 'midwest', 'south', 'outside territories', 'non-us')) DEFAULT 'not specified'
 );
 
 DROP TABLE IF EXISTS question;
 CREATE TABLE question (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  question VARCHAR(250) NOT NULL,
+  text VARCHAR(250) NOT NULL,
+  q_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   author_id INTEGER NOT NULL,
-  FOREIGN KEY (author_id) references user(id)
+  CONSTRAINT user_id_fk_q FOREIGN KEY (author_id) REFERENCES user(id)
 );
 
 DROP TABLE IF EXISTS answer;
 CREATE TABLE answer (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  answer VARCHAR(250) NOT NULL,
+  text VARCHAR(250) NOT NULL,
   question_id INTEGER NOT NULL,
   author_id INTEGER NOT NULL,
-  FOREIGN KEY (question_id) references question(id),
-  FOREIGN KEY (author_id) references user(id)
+  a_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT question_id_fk FOREIGN KEY (question_id) REFERENCES question(id),
+  CONSTRAINT user_id_fk_a FOREIGN KEY (author_id) REFERENCES user(id)
 );
 
-DROP TABLE IF EXISTS vote;
-CREATE TABLE vote (
+DROP TABLE IF EXISTS choose;
+CREATE TABLE choose (
   user_id INTEGER NOT NULL,
   answer_id INTEGER NOT NULL,
-  FOREIGN KEY (user_id) references user(id),
-  FOREIGN KEY (answer_id) references answer(id)
+  c_time timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (answer_id, user_id),
+  CONSTRAINT answer_id_fk_c FOREIGN KEY (answer_id) REFERENCES answer(id),
+  CONSTRAINT user_id_fk_c FOREIGN KEY (user_id) REFERENCES user(id)
 );

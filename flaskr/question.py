@@ -1,6 +1,5 @@
 from flask import Blueprint, flash, g, redirect, render_template, request, url_for
 from werkzeug.exceptions import abort
-import sys
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
@@ -13,8 +12,8 @@ def index():
     db = get_db()
     # gets the questions a user hasn't answered yet
     question = db.execute(
-        'SELECT q.id, question, a.id, a.answer'
-        ' FROM question q LEFT JOIN answer a on a.question_id = q.id LEFT JOIN vote v on a.id = v.answer_id'
+        'SELECT q.id, q.text, a.id, a.text'
+        ' FROM question q LEFT JOIN answer a on a.question_id = q.id LEFT JOIN choose v on a.id = v.answer_id'
         ' WHERE (v.user_id IS NULL OR v.user_id NOT LIKE ?) AND q.author_id NOT LIKE ? AND a.author_id NOT LIKE ?',
         (g.user['id'], g.user['id'], g.user['id'])
     ).fetchone()
@@ -23,7 +22,7 @@ def index():
 
     if question != None:
         answers = db.execute(
-            'SELECT a.id, answer'
+            'SELECT a.id, a.text'
             ' FROM answer a'
             ' WHERE a.question_id = ?;',
             (question['id'],)
@@ -35,11 +34,11 @@ def index():
 @login_required
 def create():
     if request.method == 'POST':
-        question = request.form['question']
+        question_text = request.form['question_text']
         error = None
 
         # errors if a question is not supplied
-        if not question:
+        if not question_text:
             error = 'Question is required.'
         
         if error is not None:
@@ -49,9 +48,9 @@ def create():
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO question (question, author_id)'
+                'INSERT INTO question (text, author_id)'
                 ' VALUES (?, ?)',
-                (question, g.user['id'])
+                (question_text, g.user['id'])
             )
             db.commit()
             return redirect(url_for('question.index'))
@@ -63,7 +62,7 @@ def get_question(id, check_author=True):
     # makes query for post matching user and post id
     question = get_db().execute(
         'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' FROM question q JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
     ).fetchone()
