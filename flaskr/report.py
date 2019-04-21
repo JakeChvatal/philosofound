@@ -55,5 +55,4 @@ def report(answerId):
         flash(error)
     
     db.commit()
-    # TODO: replace answer with question?
-    return redirect(url_for('answer.index', chosen_answer = answerId))
+    return redirect(url_for('question.index'))

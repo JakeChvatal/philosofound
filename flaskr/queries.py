@@ -10,13 +10,14 @@ def get_question(db, answerId):
 
 # question.question_id -> [answer_id, answer.text, num_respondents]
 # retrieves all of the answers to a given question id
-def get_question_answers(db, questionId):
+# excludes answers that a user has reported
+def get_question_answers(db, questionId, userId):
     return db.execute(
         'SELECT a.answer_id as answer_id, a.text, COUNT(c.answer_id) as num_respondents'
-        ' FROM answer a JOIN choose c on(a.answer_id = c.answer_id)'
-        ' WHERE a.question_id = ?'
+        ' FROM answer a JOIN choose c on(a.answer_id = c.answer_id) JOIN report r ON(a.answer_id = r.answer_id)'
+        ' WHERE a.question_id = ? AND r.user_id != ?'
         ' GROUP BY c.answer_id',
-        (questionId,)
+        (questionId, userId)
     ).fetchall()
 
 # question.question_id -> Number

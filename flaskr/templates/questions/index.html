@@ -19,6 +19,9 @@
                         <form action="{{ url_for('choose.choose', answerId=answer['answer_id']) }}" method="post">
                             <input type="submit" value="Vote for this answer">
                         </form>
+                        <form action="{{ url_for('report.report', answerId=answer['answer_id']) }}" method="post">
+                            <input type="submit" value="Report this answer">
+                        </form>
                     {% endfor %}
                     <form action="{{ url_for('answer.create', questionId=question['question_id']) }}" method="post">
                         <input name="answer_text" id="answer_text" value="{{ request.form['answer_text'] }}" required>

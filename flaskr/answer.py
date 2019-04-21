@@ -32,12 +32,15 @@ def index(chosen_answer):
     return render_template('answer/index.html', question = question, answers = answers, demographic = demographic, demographic_info = demographic_info, answer_count = answer_count)
 
 
-@bp.route('/<int:questionId>/createAnswer', methods=('POST',))
+@bp.route('/<int:questionId>/create', methods=('POST',))
 @login_required
 def create(questionId):
     answer_text = request.form['answer_text']
     db = get_db()
     error = None
+
+    question = None
+    answers = None
     
     # error message displayed if a question is not supplied
     if not answer_text:

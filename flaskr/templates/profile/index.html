@@ -1,22 +1,30 @@
 {% extends 'base.html' %}
 
-<!-- when user is logged in, link is available to create a question-->
+{% block header %}
+  <h1>{% block title %}My Questions and Answers{% endblock %}</h1>
+{% endblock %}
 
 {% block content %}
-    <h2>My Questions and Answers</h2>
-    
+    <!-- All questions asked by the current user -->
     {% if questions != None %}
         <h2>Questions Asked</h2>
         {% for question in questions %}
             <h3>{{ question['text'] }}</h3>
+            <form action="{{url_for(answers.index, answerId=answer['answer_id'] }}" method="post">
+                <input type="submit" value="View question statistics">
+            </form>
         {% endfor %}
     {% endif %}
 
+    <!-- All answers provided by the current user -->
     {% if answers != None %}
         <h2>Answers Provided</h2>
         {% for answer in answers %}
             <h3>{{ answer['question_text'] }}</h3>
             <h4>{{ answer['text'] }}</h4>
+            <form action="{{url_for(answers.index, answerId=answer['answer_id'] }}" method="post">
+                <input type="submit" value="View question statistics">
+            </form>
         {% endfor %}
     {% endif %}
 {% endblock %}

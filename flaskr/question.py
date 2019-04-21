@@ -31,7 +31,7 @@ def index():
     # gets random question if possible
     if questions != None and len(questions) != 0:
         question = questions[random.randint(0, len(questions) - 1)]
-        answers = get_question_answers(db, question['question_id'])
+        answers = get_question_answers(db, question['question_id'], g.user['user_id'])
 
     return render_template('questions/index.html', question = question, answers = answers)
 
