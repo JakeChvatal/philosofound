@@ -22,6 +22,7 @@ def index(chosen_answer):
     
     if request.method == 'POST':        
         try:
+            # gets the demographic answer associated with the answer we want to see analytics fo
             demographic = request.form[str(chosen_answer)]
         except:
             demographic = None
