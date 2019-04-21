@@ -13,11 +13,10 @@ def get_question(db, answerId):
 # excludes answers that a user has reported
 def get_question_answers(db, questionId, userId):
     return db.execute(
-        'SELECT a.answer_id, a.text' #, COUNT(c.answer_id) as num_respondents'
-        ' FROM answer a JOIN choose c on(a.answer_id = c.answer_id)' # JOIN report r ON(a.answer_id = r.answer_id)'
-        ' WHERE a.question_id = ?' # AND r.user_id = ?'
-        , #' GROUP BY c.answer_id',
-        (questionId,)# userId)
+        'SELECT a.answer_id, a.text'
+        ' FROM answer a JOIN choose c on(a.answer_id = c.answer_id)'
+        ' WHERE a.question_id = ?' 
+        (questionId,)
     ).fetchall()
 
 # question.question_id -> Number
@@ -43,6 +42,7 @@ def times_answer_chosen(db, answerId):
 
 # answer.answer_id, demographic -> [demographic, num_responses, num_chose, percent_chose, answer_selected]
 # computes user statistics by demographic information for some answer and chosen demographic
+# formatting the string is fine as demographic is limited to a certain enumeration of categories
 def get_demographic_info(db, answerId, demographic):
     num_responses = times_answer_chosen(db, answerId)
     if demographic in ["gender", "income", "party", "geography"]:

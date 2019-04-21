@@ -4,8 +4,9 @@ import click
 from flask import current_app, g
 from flask.cli import with_appcontext
 
-# g : unique object for every request
+# this file was created primarily by the Flask tutorial available on the Flask webpage
 
+# g : unique object for every request
 def get_db():
     if 'db' not in g:
         # connects to file pointed at by DATABASE

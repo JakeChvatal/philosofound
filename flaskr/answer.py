@@ -7,20 +7,15 @@ from flaskr.queries import get_question, get_question_answers, count_answers, ge
 
 bp = Blueprint('answer', __name__)
 # accepts a chosen answer, retrieving all of the associated questions and answers for it
-@bp.route('/<int:chosen_answer>', methods = ('POST','GET'))
+@bp.route('/questions/<int:chosen_answer>/statistics', methods = ('POST','GET'))
 @login_required
 def index(chosen_answer):
-    db = get_db()
     
-    #question = get_question(db, chosen_answer)
-    #answers = get_question_answers(db, question['question_id'])
-    #answer_count = count_answers(db, question['question_id'])
-
     demographic = None
     demographic_info = None
     db = get_db()
-    demographic_info = None
     
+    # gets the question associated with the answer chosen
     question = db.execute(
         'SELECT q.question_id, q.text'
         ' FROM question q JOIN answer a on(q.question_id = a.question_id)'
@@ -28,6 +23,7 @@ def index(chosen_answer):
         (chosen_answer,)
     ).fetchone()
 
+    # gets all of the answers associated with a question id
     answers = db.execute(
         'SELECT a.answer_id as answer_id, a.text, COUNT(c.answer_id) as num_respondents'
         ' FROM answer a JOIN choose c on(a.answer_id = c.answer_id)'
@@ -36,6 +32,7 @@ def index(chosen_answer):
         (question['question_id'],)
     ).fetchall()
 
+    # counts all of the answers associated with a question
     answer_count = db.execute(
         'SELECT COUNT(c.user_id) as answer_count'
         ' FROM answer a JOIN choose c on(a.answer_id == c.answer_id)'
@@ -44,6 +41,7 @@ def index(chosen_answer):
         (question['question_id'],)
     ).fetchone()['answer_count']
 
+    # if demographic info is being sent, query for the demographic information
     if request.method == 'POST':        
         try:
             demographic = request.form[str(chosen_answer)]
@@ -56,7 +54,7 @@ def index(chosen_answer):
     return render_template('answer/index.html', question = question, answers = answers, demographic = demographic, demographic_info = demographic_info, answer_count = answer_count)
 
 
-@bp.route('/<int:questionId>/create', methods=('POST',))
+@bp.route('/questions/<int:questionId>/add_answer', methods=('POST',))
 @login_required
 def create(questionId):
     answer_text = request.form['answer_text']
@@ -70,9 +68,7 @@ def create(questionId):
     if not answer_text:
         error = 'Answer is required.'
 
-    # error message displayed if a very similar answer already exists in the db 
-    #elif has_duplicate_answer(db, questionId, answer_text):
-    #    error = "This answer already exists for this question! Your vote has been registered for that answer."
+    # error message displayed if anotherr answer already exists in the db 
     duplicate_answer = db.execute(
         'SELECT *'
         ' FROM answer'
@@ -82,13 +78,9 @@ def create(questionId):
 
     if duplicate_answer is not None:
         error = "This answer already exists for this question! Your vote has been registered for that answer."
-    # if no error, adds an answer to the database
+    
     else:
-        #answer_id = create_answer(db, questionId, g.user['user_id'], answer_text)    
-        #question = get_question(db, answer_id)
-        #answers = get_question_answers(db, question['question_id'], g.user['user_id'])
-        
-        # creates a new answer
+        # if no error, adds an answer to the database    
         db.execute(
             'INSERT INTO answer (text, question_id, author_id)'
             ' VALUES (?, ?, ?)',
@@ -98,6 +90,7 @@ def create(questionId):
     if error is not None:
         flash(error)
 
+    # finds the answer id of the newly inserted answer
     answer_id = db.execute(
         'SELECT answer.answer_id'
         ' FROM answer'
@@ -118,6 +111,7 @@ def create(questionId):
             (g.user['user_id'], answer_id)
         )
 
+    # gets the question asked based on the answer_id we have
     question = db.execute(
         'SELECT q.question_id, q.text'
         ' FROM question q JOIN answer a on(q.question_id = a.question_id)'
@@ -125,6 +119,7 @@ def create(questionId):
         (answer_id,)
     ).fetchone()
 
+    # gets all answers associated with our question
     answers = db.execute(
         'SELECT a.answer_id, a.text'
         ' FROM answer a'

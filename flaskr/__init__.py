@@ -28,10 +28,11 @@ def create_app(test_config=None):
     except OSError:
         pass
     
-    # creates a route for the app  
+    # initializes database
     from . import db
     db.init_app(app)
 
+    # adds endpoints for each view
     from . import auth
     app.register_blueprint(auth.bp)
 

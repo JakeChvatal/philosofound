@@ -44,7 +44,7 @@ def index():
 
 # allows the user to create a question by bringing up a create page and allowing submissions
 # notable that the user creating the question is also required to provide an answer to the question
-@bp.route('/create', methods=('GET', 'POST'))
+@bp.route('/questions/create', methods=('GET', 'POST'))
 @login_required
 def create():
     if request.method == 'POST':
@@ -60,6 +60,7 @@ def create():
         if not answer_text:
             error = 'Answer is required.'
 
+        # gets a duplicate question if it exists
         duplicate_question = db.execute(
             'SELECT *'
             ' FROM question'
@@ -70,26 +71,20 @@ def create():
         if duplicate_question is not None:
             error = "This question has already been asked by another user."
 
-        #TODO: figure out why this isn't working!
-        #if has_duplicate_question(db, question_text):
-        #    error = "This question has already been asked by another user."
-
         if error is not None:
             flash(error)
 
         # if no error, adds a question to the database
         else:
-            #question_id = create_question(db, question_text, g.user['user_id'])
-            # if the question id was found, create an answer with it
-            #create_answer(db, question_id, g.user['user_id'], answer_text)
+            # add a question
             db.execute(
                 'INSERT INTO question (text, author_id)'
                 ' VALUES (?, ?)',
                 (question_text, g.user['user_id']),
             )
 
-            #TODO: see if we can do better
             # gets the id of the just-generated question
+            # we already ensure that the question does not already exist
             question_id = db.execute(
                 'SELECT question.question_id'
                 ' FROM question'

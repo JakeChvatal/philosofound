@@ -1,6 +1,5 @@
 from flask import Blueprint, flash, g, redirect, render_template, request, url_for
 from werkzeug.exceptions import abort
-import sys
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
@@ -8,8 +7,7 @@ from flaskr.db import get_db
 bp = Blueprint('report', __name__)
 
 # allows the user to report an answer
-# TODO: remove everything because of foreign key constraints
-@bp.route('/<int:answerId>/report', methods=('POST',))
+@bp.route('/answers/<int:answerId>/report', methods=('POST',))
 @login_required
 def report(answerId):
     db = get_db()
@@ -32,8 +30,7 @@ def report(answerId):
         )
         error = "Answer has been reported."
 
-        # TODO: does this work?
-        # if the number of reports for a given answer is > 10, delete the answer
+        # if the number of reports for a given answer is >= 10, delete the answer
         # in the future we will have an administrative body able to log in and view
         # answers with certain numbers of reports and manually determine whether answers should be removed
         num_reports = db.execute(
@@ -46,17 +43,28 @@ def report(answerId):
 
         # if the number of reports is high enough, the answer is removed and the report is removed
         if num_reports >= 10:
-            db.execute(
-                'DELETE FROM answer'
-                ' WHERE answer_id = ?',
-                (answerId,)
-            )
 
+            # removes from report 
             db.execute(
                 'DELETE FROM report'
                 ' WHERE answer_id = ?',
                 (answerId,)
             )
+
+            # removes from choose
+            db.execute(
+                'DELETE FROM choose'
+                ' WHERE answer_id = ?',
+                (answerId,)
+            )
+            
+            # removes from answer now that there are no foreign key constraints
+            db.execute(
+                'DELETE FROM answer'
+                ' WHERE answer_id = ?',
+                (answerId,)
+            )
+            
             error = "Reported answer has been removed."
 
     if error is not None:

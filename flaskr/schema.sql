@@ -1,5 +1,3 @@
--- instantiates initial sql for this thing
-
 DROP TABLE IF EXISTS user;
 CREATE TABLE user (
   user_id INTEGER PRIMARY KEY AUTOINCREMENT,
