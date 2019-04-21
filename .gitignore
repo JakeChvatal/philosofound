@@ -14,3 +14,7 @@ build/
 *.egg-info/
 
 .vscode/
+
+env/
+dist/
+build/
