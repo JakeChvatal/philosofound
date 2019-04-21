@@ -1,9 +1,9 @@
-html { font-family: sans-serif; background: #eee; padding: 1rem; }
+html { font-family: "Helvetica", serif; background: #eee; padding: 1rem; }
 body { max-width: 960px; margin: 0 auto; background: white; }
-h1 { font-family: serif; color: #822f2a; margin: 1rem 0; }
-a { color: #822f2a; }
+h1 { font-family: "Helvetica", serif; color: #681818; margin: 1rem 0; }
+a { color: #681818; }
 hr { border: none; border-top: 1px solid lightgray; }
-nav { background: lightgray; display: flex; align-items: center; padding: 0 0.5rem; }
+nav { background: #e0e0eb; display: flex; align-items: center; padding: 0.5rem 0.5rem; }
 nav h1 { flex: auto; margin: 0; }
 nav h1 a { text-decoration: none; padding: 0.25rem 0.5rem; }
 nav ul  { display: flex; list-style: none; margin: 0; padding: 0; }
@@ -11,12 +11,7 @@ nav ul li a, nav ul li span, header .action { display: block; padding: 0.5rem; }
 .content { padding: 0 1rem 1rem; }
 .content > header { border-bottom: 1px solid lightgray; display: flex; align-items: flex-end; }
 .content > header h1 { flex: auto; margin: 1rem 0 0.25rem 0; }
-.flash { margin: 1em 0; padding: 1em; background: 822f2a; border: 1px solid #822f2a; }
-.post > header { display: flex; align-items: flex-end; font-size: 0.85em; }
-.post > header > div:first-of-type { flex: auto; }
-.post > header h1 { font-size: 1.5em; margin-bottom: 0; }
-.post .about { color: slategray; font-style: italic; }
-.post .body { white-space: pre-line; }
+.flash { margin: 1em 0; padding: 1em; background: 822f2a; border: 1px solid #681818; }
 .content:last-child { margin-bottom: 0; }
 .content form { margin: 1em 0; display: flex; flex-direction: column; }
 .content label { font-weight: bold; margin-bottom: 0.5em; }
@@ -37,7 +32,7 @@ td, th {
     padding-top: 12px;
     padding-bottom: 12px;
     text-align: left;
-    background-color: #4CAF50;
+    background-color: #681818;
     color: white;
   }
   

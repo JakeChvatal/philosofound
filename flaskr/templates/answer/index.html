@@ -30,10 +30,12 @@
                         <input type="submit" value="View">
                     </form>
                     {% if demographic_info != None %}
+                        {% if demographic_info[0]['answer_selected'] == answer['answer_id'] %}
                         <table>
                             <th>{{ demographic }}</th>
                             <th># Responses</th>
                             <th>% Responses</th>
+                        {% endif %}
                         {% for demo in demographic_info %}
                             {% if answer['answer_id'] == demo['answer_selected'] %}
                             <tr>

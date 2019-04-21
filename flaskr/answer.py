@@ -146,11 +146,7 @@ def create(questionId):
     ).fetchone()
 
     if duplicate_answer is not None:
-        error = "This answer already exists for this question! Vote for that answer."
-
-    if error is not None:
-        flash(error)
-
+        error = "This answer already exists for this question! Your vote has been registered for that answer."
     # if no error, adds an answer to the database
     else:
         # creates a new answer
@@ -160,34 +156,37 @@ def create(questionId):
             (answer_text, questionId, g.user['user_id'])
         )
 
-        answer_id = db.execute(
-            'SELECT answer.answer_id'
-            ' FROM answer'
-            ' WHERE answer.text = ? AND answer.question_id = ?',
-            (answer_text, questionId)
-        ).fetchone()['answer_id']
+    if error is not None:
+        flash(error)
 
-        # user automatically chooses an answer they create
-        db.execute(
-            'INSERT INTO choose (user_id, answer_id)'
-            ' VALUES (?, ?)',
-            (g.user['user_id'], answer_id)
-        )
+    answer_id = db.execute(
+        'SELECT answer.answer_id'
+        ' FROM answer'
+        ' WHERE answer.text = ? AND answer.question_id = ?',
+        (answer_text, questionId)
+    ).fetchone()['answer_id']
 
-        question = db.execute(
-            'SELECT q.question_id, q.text'
-            ' FROM question q JOIN answer a on(q.question_id = a.question_id)'
-            ' WHERE a.answer_id = ?',
-            (answer_id,)
-        ).fetchone()
+    # user automatically chooses an answer they create
+    db.execute(
+        'INSERT INTO choose (user_id, answer_id)'
+        ' VALUES (?, ?)',
+        (g.user['user_id'], answer_id)
+    )
 
-        answers = db.execute(
-            'SELECT a.answer_id, a.text'
-            ' FROM answer a'
-            ' WHERE a.question_id = ?;',
-            (question['question_id'],)
-        ).fetchall()
-        
-        db.commit()
+    question = db.execute(
+        'SELECT q.question_id, q.text'
+        ' FROM question q JOIN answer a on(q.question_id = a.question_id)'
+        ' WHERE a.answer_id = ?',
+        (answer_id,)
+    ).fetchone()
+
+    answers = db.execute(
+        'SELECT a.answer_id, a.text'
+        ' FROM answer a'
+        ' WHERE a.question_id = ?;',
+        (question['question_id'],)
+    ).fetchall()
+    
+    db.commit()
 
     return render_template('answer/index.html', question = question, answers = answers)
