@@ -6,25 +6,39 @@ from flaskr.auth import login_required
 from flaskr.db import get_db
 
 bp = Blueprint('answer', __name__)
-@bp.route('/<int:questionId>', methods = ('POST','GET'))
+@bp.route('/<int:chosen_answer>', methods = ('POST','GET'))
 @login_required
-def index(questionId):
+def index(chosen_answer):
     db = get_db()
-    demographic = request.form['demographic']
     demographic_info = None
     
-    chosen_answer = db.execute(
-        'SELECT a.answer_id'
-        ' FROM answer a JOIN choose c on(a.answer_id = c.answer_id)'
-        ' WHERE a.question_id = ? AND c.user_id = ?',
-        (questionId, g.user['user_id'])
-    ).fetchone()['answer_id']
-
     question = db.execute(
-        'SELECT *'
-        ' from question'
-        ' WHERE question_id = ?',
-        (questionId,)
+        'SELECT '
+        ' from question q JOIN answer a on(q.question_id = a.question_id)'
+        ' WHERE a.answer_id = ?',
+        (chosen_answer,)
+    ).fetchone()
+
+    answers = db.execute(
+        'SELECT a.answer_id, a.text'
+        ' FROM answer a'
+        ' WHERE a.question_id = ?;',
+        (question['question_id'],)
+    )
+
+    return render_template('answer/index.html', question = question, answers = answers, demographic_info = demographic_info)
+
+@bp.route('/<int:chosen_answer>/reload', methods = ('POST','GET'))
+@login_required
+def index_reloaded(chosen_answer):
+    db = get_db()
+    demographic_info = None
+    
+    question = db.execute(
+        'SELECT q.question_id, q.text'
+        ' FROM question q JOIN answer a on(q.question_id = a.question_id)'
+        ' WHERE a.answer_id = ?',
+        (chosen_answer,)
     ).fetchone()
 
     answers = db.execute(
@@ -34,10 +48,13 @@ def index(questionId):
         (question['question_id'],)
     )
     
+    demographic = request.form['demographic']
+    
     if demographic is not None and demographic != "Choose an option...":
-        demographic_info = get_demographic_info(chosen_answer, demographic)
+       demographic_info = get_demographic_info(chosen_answer, demographic)
 
-    return render_template('answer/index.html', question = question, answers = answers, demographic_info = demographic_info)
+    return render_template('answer/index.html', question = question, answers = answers, demographic = demographic, demographic_info = demographic_info)
+
 
 def get_demographic_info(answerId, demographic):
     db = get_db()
@@ -49,14 +66,44 @@ def get_demographic_info(answerId, demographic):
         (answerId,)
     ).fetchone()['count']
 
-    return db.execute(
-        'SELECT ?, ?, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose'
-        ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
-        ' WHERE answer_id = ?'
-        ' GROUP BY ?'
-        ' ORDER BY ?',
-        (demographic, num_responses, num_responses, answerId, demographic, demographic)
-    ).fetchall()
+    if demographic == "gender":
+        return db.execute(
+            'SELECT gender as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose'
+            ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
+            ' WHERE answer_id = ?'
+            ' GROUP BY ?'
+            ' ORDER BY ?',
+            (num_responses, num_responses, answerId, demographic, demographic)
+        ).fetchall()
+    elif demographic == "income":
+        return db.execute(
+            'SELECT income as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose'
+            ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
+            ' WHERE answer_id = ?'
+            ' GROUP BY ?'
+            ' ORDER BY ?',
+            (num_responses, num_responses, answerId, demographic, demographic)
+        ).fetchall()
+    elif demographic == "party":
+        return db.execute(
+            'SELECT party as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose'
+            ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
+            ' WHERE answer_id = ?'
+            ' GROUP BY ?'
+            ' ORDER BY ?',
+            (num_responses, num_responses, answerId, demographic, demographic)
+        ).fetchall()
+    elif demographic == "geography":
+        return db.execute(
+            'SELECT gender as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose'
+            ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
+            ' WHERE answer_id = ?'
+            ' GROUP BY ?'
+            ' ORDER BY ?',
+            (num_responses, num_responses, answerId, demographic, demographic)
+        ).fetchall()
+    else:
+        return None
 
 @bp.route('/<int:questionId>/createAnswer', methods=('POST',))
 @login_required
@@ -107,5 +154,5 @@ def create(questionId):
         )
         
         db.commit()
-        # TODO: redirect to answer page, not questions
-    return redirect(url_for('answer.index'))
+
+    return render_template('answer/index.html', question = question, answers = answers, demographic_info = demographic_info)
