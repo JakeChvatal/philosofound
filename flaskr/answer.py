@@ -27,7 +27,15 @@ def index(chosen_answer):
         (question['question_id'],)
     ).fetchall()
 
-    return render_template('answer/index.html', question = question, answers = answers, demographic_info = demographic_info)
+    answer_count = db.execute(
+        'SELECT COUNT(c.user_id) as answer_count'
+        ' FROM answer a JOIN choose c on(a.answer_id == c.answer_id)'
+        ' WHERE a.question_id == ?'
+        ' GROUP BY a.answer_id',
+        (question['question_id'],)
+    ).fetchone()['answer_count']
+
+    return render_template('answer/index.html', question = question, answers = answers, demographic_info = demographic_info, answer_count = answer_count)
 
 @bp.route('/<int:chosen_answer>/reload', methods = ('POST','GET'))
 @login_required
@@ -50,12 +58,21 @@ def index_reloaded(chosen_answer):
         (question['question_id'],)
     ).fetchall()
 
+    answer_count = db.execute(
+        'SELECT COUNT(c.user_id) as answer_count'
+        ' FROM answer a JOIN choose c on(a.answer_id == c.answer_id)'
+        ' WHERE a.question_id == ?'
+        ' GROUP BY a.answer_id',
+        (question['question_id'],)
+    ).fetchone()['answer_count']
+
+
     demographic = request.form[str(chosen_answer)]
 
     if demographic is not None and demographic != "Choose an option...":
        demographic_info = get_demographic_info(chosen_answer, demographic)
 
-    return render_template('answer/index.html', question = question, answers = answers, demographic = demographic, demographic_info = demographic_info)
+    return render_template('answer/index.html', question = question, answers = answers, demographic = demographic, demographic_info = demographic_info, answer_count = answer_count)
 
 
 def get_demographic_info(answerId, demographic):
@@ -73,36 +90,36 @@ def get_demographic_info(answerId, demographic):
             'SELECT gender as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose, ? as answer_selected'
             ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
             ' WHERE answer_id = ?'
-            ' GROUP BY ?'
-            ' ORDER BY ?',
-            (num_responses, num_responses, answerId, answerId, demographic, demographic)
+            ' GROUP BY gender'
+            ' ORDER BY gender',
+            (num_responses, num_responses, answerId, answerId)
         ).fetchall()
     elif demographic == "income":
         return db.execute(
             'SELECT income as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose, ? as answer_selected'
             ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
             ' WHERE answer_id = ?'
-            ' GROUP BY ?'
-            ' ORDER BY ?',
-            (num_responses, num_responses, answerId, answerId, demographic, demographic)
+            ' GROUP BY income'
+            ' ORDER BY income',
+            (num_responses, num_responses, answerId, answerId)
         ).fetchall()
     elif demographic == "party":
         return db.execute(
             'SELECT party as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose, ? as answer_selected'
             ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
             ' WHERE answer_id = ?'
-            ' GROUP BY ?'
-            ' ORDER BY ?',
-            (num_responses, num_responses, answerId, answerId, demographic, demographic)
+            ' GROUP BY party'
+            ' ORDER BY party',
+            (num_responses, num_responses, answerId, answerId)
         ).fetchall()
     elif demographic == "geography":
         return db.execute(
             'SELECT geography as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose, ? as answer_selected'
             ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
             ' WHERE answer_id = ?'
-            ' GROUP BY ?'
-            ' ORDER BY ?',
-            (num_responses, num_responses, answerId, answerId, demographic, demographic)
+            ' GROUP BY geography'
+            ' ORDER BY geography',
+            (num_responses, num_responses, answerId, answerId)
         ).fetchall()
     else:
         return None

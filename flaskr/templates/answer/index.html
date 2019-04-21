@@ -11,7 +11,9 @@
 {% block content %}
     <article class="question">
         <header>
-            <div><h1>{{question['text'] }}</h1>
+            <div>
+                <h1>{{question['text'] }}</h1>
+                <h4># Responses: {{ answer_count }}</h4>
                 {% if answer != None %}
                 {% for answer in answers %}
                     <h2>{{answer['text'] }}</h2>
@@ -37,7 +39,7 @@
                             <tr>
                                 <td>{{ demo['demographic'] }}</td>
                                 <td>{{ demo['num_chose'] }}</td>
-                                <td>{{ demo['percent_chose'] }}</td>
+                                <td>{{ demo['percent_chose'] }}%</td>
                             </tr>
                             {% endif %}
                         {% endfor %}
