@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+<!-- when user is logged in, link is available to create a question-->
+
+{% block content %}
+    <h2>My Questions and Answers</h2>
+    
+    {% if questions != None %}
+        <h2>Questions Asked</h2>
+        {% for question in questions %}
+            <h3>{{ question['text'] }}</h3>
+        {% endfor %}
+    {% endif %}
+
+    {% if answers != None %}
+        <h2>Answers Provided</h2>
+        {% for answer in answers %}
+            <h3>{{ answer['question_text'] }}</h3>
+            <h4>{{ answer['text'] }}</h4>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

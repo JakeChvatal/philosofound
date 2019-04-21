@@ -41,3 +41,12 @@ CREATE TABLE choose (
   CONSTRAINT answer_id_fk_c FOREIGN KEY (answer_id) REFERENCES answer(id),
   CONSTRAINT user_id_fk_c FOREIGN KEY (user_id) REFERENCES user(id)
 );
+
+DROP TABLE IF EXISTS report;
+CREATE TABLE report (
+  user_id INTEGER NOT NULL,
+  answer_id INTEGER NOT NULL,
+  PRIMARY KEY (answer_id, user_id),
+  CONSTRAINT answer_id_fk_c FOREIGN KEY (answer_id) REFERENCES answer(id),
+  CONSTRAINT user_id_fk_c FOREIGN KEY (user_id) REFERENCES user(id)
+)

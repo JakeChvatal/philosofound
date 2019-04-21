@@ -86,7 +86,7 @@ def has_duplicate_question(db, question_text):
         (question_text,)
     ).fetchone() != None
 
-# question.question_id, user.user_id, answer.answer_text -> XX
+# question.question_id, user.user_id, answer.answer_text -> answer.answer_id
 # creates an answer for a user and votes for that answer
 # EFFECT: Creates answer and vote in database
 def create_answer(db, question_id, user_id, answer_text):
@@ -105,12 +105,16 @@ def create_answer(db, question_id, user_id, answer_text):
         (answer_text, question_id)
     ).fetchone()['answer_id']
 
-    # user automatically chooses an answer they create
-    db.execute(
-        'INSERT INTO choose (user_id, answer_id)'
-        ' VALUES (?, ?)',
-        (user_id, answer_id)
-    )
+    # if the user has not already voted for this answer
+    if not has_duplicate_vote(db, answer_id, user_id):
+        # user automatically chooses an answer they create
+        db.execute(
+            'INSERT INTO choose (user_id, answer_id)'
+            ' VALUES (?, ?)',
+            (user_id, answer_id)
+        )
+
+    return answer_id
 
 # question.text, user.user_id -> question.question_id
 # creates a question and returns its id
