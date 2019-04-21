@@ -3,7 +3,6 @@ from flask import Blueprint, flash, g, redirect, render_template, request, sessi
 from werkzeug.security import check_password_hash, generate_password_hash
 from flaskr.db import get_db
 
-# creates a blueprint called auth
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 # adds route to endpoint
@@ -21,28 +20,29 @@ def register():
         db = get_db()
         error = None
         
-        # catches missing username, missing password, existing db entity
-        for field in ['username', 'password', 'gender', 'income', 'party', 'geography']:
-            if not request.form[field] or request.form[field] == "Choose an option...":
-                error = field + " is required."
-        
+        # catches missing username, password or required field
         if not username:
             error = 'Username is required.'
+        
         elif not password:
             error = 'Password is required.'
+        
         elif gender == "Choose an option...":
             error = 'Gender is required.'
+        
         elif income == "Choose an option...":
             error = 'Income is required.'
+        
         elif party == "Choose an option...":
             error = 'Party is required.'
+        
         elif geography == "Choose an option...":
             error = "Geography is required."
+
+        # enforces unique username constraint
         elif db.execute(
             'SELECT user_id FROM user WHERE username = ?', (username,)
-            # fetchone gets first row of the query
         ).fetchone() is not None:
-            #.format inserts things in order into curly braces
             error = 'User {} is already registered.'.format(username)
         
         # add user to database if there is no error
@@ -53,9 +53,11 @@ def register():
                 (username, generate_password_hash(password), gender, income, party, geography)
             )
             db.commit()
-            # generates redirect response for the url (???)
+
+            # redirects to login page
             return redirect(url_for('auth.login'))
         else:
+            # displays an error, does not permit registration
             flash(error)
     
     return render_template('auth/register.html')
@@ -68,7 +70,6 @@ def login():
         password = request.form['password']
         db = get_db()
         error = None
-        # queries db 
         user = db.execute(
             'SELECT * FROM user WHERE username = ?', (username,)
         ).fetchone()
@@ -79,11 +80,8 @@ def login():
         elif not check_password_hash(user['password'], password):
             error = 'Incorrect password.'
         
+        # user information is stored in a cookie if the information is valid
         if error is None:
-            # session: dict that stores data across requests
-            # when validation is successful, user id is stored in session
-            # this is stored in cookie sent to browser
-            # browser sends this cookie back with subsequent requests
             session.clear()
             session['user_id'] = user['user_id']
             return redirect(url_for('index'))
@@ -92,6 +90,7 @@ def login():
     
     return render_template('auth/login.html')
 
+# called before the app
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
@@ -104,26 +103,19 @@ def load_logged_in_user():
             'SELECT * FROM user WHERE user_id = ?', (user_id,)
         ).fetchone()
 
+# logs out the current user
 @bp.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
 
-# decorator
-# returns new view function that wraps view its applied to
-# adds function to check if user is loaded: redirect to login otherwise
-# if user is loaded, og view is called and continues normally
+# decorator which requires login for the function it decorates
 def login_required(view):
     @functools.wraps(view)
-    # i assume kwargs are the args for the original function
-    # functional languages are so cool!!!
+    
     def wrapped_view(**kwargs):
         if g.user is None:
             return redirect(url_for('auth.login'))
 
         return view(**kwargs)
     return wrapped_view
-
- # url_for():generates URL for view based on name and args
- # 'endpoint', same name as view function by default
- # when using a blueprint: name of blueprint is prepended to name of function
