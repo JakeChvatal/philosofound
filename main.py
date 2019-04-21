@@ -10,7 +10,7 @@ import os
 # config: tells us config is relative to instance folder
 
 os.environ["FLASK_APP"] = "flaskr"
-os.environ["FLASK_ENV"] = "development"
+os.environ["FLASK_ENV"] = "production"
 
 app = create_app()
 app.run()
