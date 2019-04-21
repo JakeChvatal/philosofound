@@ -20,11 +20,12 @@ def index(chosen_answer):
     ).fetchone()
 
     answers = db.execute(
-        'SELECT a.answer_id, a.text'
-        ' FROM answer a'
-        ' WHERE a.question_id = ?;',
+        'SELECT a.answer_id as answer_id, a.text, COUNT(c.answer_id) as num_respondents'
+        ' FROM answer a JOIN choose c on(a.answer_id = c.answer_id)'
+        ' WHERE a.question_id = ?'
+        ' GROUP BY c.answer_id',
         (question['question_id'],)
-    )
+    ).fetchall()
 
     return render_template('answer/index.html', question = question, answers = answers, demographic_info = demographic_info)
 
@@ -42,14 +43,15 @@ def index_reloaded(chosen_answer):
     ).fetchone()
 
     answers = db.execute(
-        'SELECT a.answer_id, a.text'
-        ' FROM answer a'
-        ' WHERE a.question_id = ?;',
+        'SELECT a.answer_id as answer_id, a.text, COUNT(c.answer_id) as num_respondents'
+        ' FROM answer a JOIN choose c on(a.answer_id = c.answer_id)'
+        ' WHERE a.question_id = ?'
+        ' GROUP BY c.answer_id',
         (question['question_id'],)
-    )
+    ).fetchall()
 
     demographic = request.form[str(chosen_answer)]
-    
+
     if demographic is not None and demographic != "Choose an option...":
        demographic_info = get_demographic_info(chosen_answer, demographic)
 
@@ -114,7 +116,6 @@ def create(questionId):
     
     question = None
     answers = None
-    
 
     # errors if a question is not supplied
     if not answer_text:
