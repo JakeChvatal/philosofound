@@ -166,12 +166,18 @@ def create(questionId):
         (answer_text, questionId)
     ).fetchone()['answer_id']
 
-    # user automatically chooses an answer they create
-    db.execute(
-        'INSERT INTO choose (user_id, answer_id)'
-        ' VALUES (?, ?)',
-        (g.user['user_id'], answer_id)
-    )
+    if db.execute(
+        'SELECT *'
+        ' FROM choose'
+        '  WHERE answer_id == ? AND user_id == ?',
+        (answer_id, g.user['user_id'])
+    ) is not None:
+        # user automatically chooses an answer they create
+        db.execute(
+            'INSERT INTO choose (user_id, answer_id)'
+            ' VALUES (?, ?)',
+            (g.user['user_id'], answer_id)
+        )
 
     question = db.execute(
         'SELECT q.question_id, q.text'
@@ -189,4 +195,4 @@ def create(questionId):
     
     db.commit()
 
-    return render_template('answer/index.html', question = question, answers = answers)
+    return render_template('answer/index.html', question = question, answers = answers, demographic_info = None)

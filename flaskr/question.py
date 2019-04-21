@@ -3,6 +3,7 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
+import random
 
 bp = Blueprint('question', __name__)
 
@@ -11,7 +12,7 @@ bp = Blueprint('question', __name__)
 def index():
     db = get_db()
     # gets the questions a user hasn't answered yet
-    question = db.execute(
+    questions = db.execute(
         'SELECT question.question_id, question.text'
         ' FROM question'
         ' WHERE question.question_id NOT IN'
@@ -19,11 +20,15 @@ def index():
         ' join choose c on (a.answer_id = c.answer_id)'
         ' WHERE c.user_id = ?);',
         (g.user['user_id'],)
-    ).fetchone()
+    ).fetchall()
 
+    question = None
     answers = None
 
-    if question != None:
+    if questions != None and len(questions) != 0:
+        # gets random question
+        question = questions[random.randint(0, len(questions) - 1)]
+
         answers = db.execute(
             'SELECT a.answer_id, a.text'
             ' FROM answer a'
@@ -110,32 +115,3 @@ def create():
             return redirect(url_for('question.index'))
 
     return render_template('questions/create.html')
-
-# gets a question without checking its author?? 
-"""def get_question(id, check_author=True):
-    # makes query for post matching user and post id
-    question = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM question q JOIN user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
-        (id,)
-    ).fetchone()
-
-    if question is None:
-        abort(404, "Question id {0} doesn't exist".format(id))
-    
-    # raises exception, returning http status code
-    if check_author and question['author_id'] != g.user['user_id']:
-        abort(403)
-    
-    return question
-
-@bp.route('/<int:id>/delete', methods=('POST',))
-@login_required
-def delete(id):
-    get_question(id)
-    db = get_db()
-    db.execute('DELETE FROM question WHERE id = ?', (id,))
-    db.commit()
-    return redirect(url_for('questions.index'))
-"""
