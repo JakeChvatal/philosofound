@@ -2,7 +2,7 @@
 # Accesses the question data associated with an Answer ID
 def get_question(db, answerId):
     question = db.execute(
-        'SELECT q.question_id, q.text'
+        'SELECT q.question_id as question_id, q.text'
         ' FROM question q JOIN answer a on(q.question_id = a.question_id)'
         ' WHERE a.answer_id = ?',
         (answerId,)
@@ -69,9 +69,64 @@ def has_duplicate_answer(db, questionId, answer_text):
 
 # answer.answer_id -> Boolean
 # determines whether the current user has already voted for an answer
-def has_duplicate_vote(db, answer_id):
+def has_duplicate_vote(db, answer_id, user_id):
     return db.execute(
         'SELECT *'
         ' FROM choose'
         '  WHERE answer_id == ? AND user_id == ?',
-        (answer_id, g.user['user_id'])).fetchall() != None
+        (answer_id, user_id)).fetchall() != None
+
+# question.text -> Boolean
+# determines whether a question already exists
+def has_duplicate_question(db, question_text):
+    return db.execute(
+        'SELECT *'
+        ' FROM question'
+        ' WHERE question.text LIKE ?',
+        (question_text,)
+    ).fetchone() != None
+
+# question.question_id, user.user_id, answer.answer_text -> XX
+# creates an answer for a user and votes for that answer
+# EFFECT: Creates answer and vote in database
+def create_answer(db, question_id, user_id, answer_text):
+    # creates the answer
+    db.execute(
+        'INSERT INTO answer (text, question_id, author_id)'
+        ' VALUES (?, ?, ?)',
+        (answer_text, question_id, user_id),
+    )
+
+    # gets the answer's id
+    answer_id = db.execute(
+        'SELECT answer.answer_id'
+        ' FROM answer'
+        ' WHERE answer.text = ? AND answer.question_id = ?',
+        (answer_text, question_id)
+    ).fetchone()['answer_id']
+
+    # user automatically chooses an answer they create
+    db.execute(
+        'INSERT INTO choose (user_id, answer_id)'
+        ' VALUES (?, ?)',
+        (user_id, answer_id)
+    )
+
+# question.text, user.user_id -> question.question_id
+# creates a question and returns its id
+# EFFECT: creates a question in the question database
+def create_question(db, question_text, user_id):
+    # creates a question
+    db.execute(
+        'INSERT INTO question (text, author_id)'
+        ' VALUES (?, ?)',
+        (question_text, user_id),
+    )
+
+    # gets the id of the just-generated question
+    return db.execute(
+        'SELECT question.question_id'
+        ' FROM question'
+        ' WHERE question.text = ?',
+        (question_text,)
+    ).fetchone()['question_id']

@@ -80,7 +80,7 @@ def create(questionId):
         (answer_text, questionId)
     ).fetchone()['answer_id']
 
-    if not has_duplicate_vote(db, answer_id):
+    if not has_duplicate_vote(db, answer_id, g.user['user_id']):
         # user automatically chooses an answer they create
         db.execute(
             'INSERT INTO choose (user_id, answer_id)'
@@ -89,7 +89,9 @@ def create(questionId):
         )
 
     question = get_question(db, answer_id)
-    answers = get_question_answers(db, question['question_id'])
+    answers = None
+    if question is not None:
+        answers = get_question_answers(db, question['question_id'])
     
     db.commit()
 
