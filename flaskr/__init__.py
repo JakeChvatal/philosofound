@@ -13,7 +13,7 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         # TODO: db path: how to replace with mysql??
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqllite')
+        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite')
     )
 
     if test_config is None:

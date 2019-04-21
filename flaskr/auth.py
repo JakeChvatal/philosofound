@@ -20,8 +20,12 @@ def register():
         
         db = get_db()
         error = None
-
+        
         # catches missing username, missing password, existing db entity
+        for field in ['username', 'password', 'gender', 'income', 'party', 'geography']:
+            if not request.form[field] or request.form[field] == "Choose an option...":
+                error = field + " is required."
+        
         if not username:
             error = 'Username is required.'
         elif not password:
@@ -41,7 +45,6 @@ def register():
             #.format inserts things in order into curly braces
             error = 'User {} is already registered.'.format(username)
         
-        
         # add user to database if there is no error
         if error is None:
             # add username and securely hashed password to db
@@ -52,15 +55,14 @@ def register():
             db.commit()
             # generates redirect response for the url (???)
             return redirect(url_for('auth.login'))
-
-        # stores message that can be retrieved when using the template
-        flash(error)
+        else:
+            flash(error)
     
-    # return register template 
     return render_template('auth/register.html')
 
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
+    # if this is a POST, login is registered
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']

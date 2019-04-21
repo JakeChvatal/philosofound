@@ -35,7 +35,7 @@ def init_db():
 def init_db_command():
     # clears db and creates new tables
     init_db()
-    click.echo('initialized the db !!!')
+    click.echo('Database has been initialized.')
 
 def init_app(app):
     # calls close_db when app is torn down; cleaning up
