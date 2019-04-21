@@ -4,6 +4,8 @@
 <nav>
   <h1>Philosofound</h1>
   <ul>
+
+    <!-- Page header: offers the user different options regardless of their current page -->
     {% if g.user %}
       <li><span>{{ g.user['username'] }}</span>
       <li><a href="{{ url_for('profile.index', user_id=g.user['user_id']) }}">Profile</a>
@@ -14,6 +16,8 @@
     {% endif %}
   </ul>
 </nav>
+
+<!-- Displays flashed messages as desired by different pages -->
 <section class="content">
   <header>
     {% block header %}{% endblock %}

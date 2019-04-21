@@ -5,6 +5,7 @@
     <h1>{% block title %}Questions{% endblock %}</h1>
     {% if g.user %}
         <a class="action" href="{{ url_for('question.create') }}">Ask a Question</a>
+        <a class="action" href="{{ url_for('question.index') }}">Another Question</a>
     {% endif %}
 {% endblock %}
 
@@ -12,6 +13,7 @@
     <article class="question">
         <header>
             <div>
+                <!-- Shows each question with a vote and report button -->
                 {% if question != none and answers != none %}
                     <h1>{{question['text'] }}</h1>
                     {% for answer in answers %}
@@ -23,6 +25,8 @@
                             <input type="submit" value="Report this answer">
                         </form>
                     {% endfor %}
+
+                <!-- Form allowing the user to create a new answer -->
                     <form action="{{ url_for('answer.create', questionId=question['question_id']) }}" method="post">
                         <input name="answer_text" id="answer_text" value="{{ request.form['answer_text'] }}" required>
                         <input type="submit" value="Add Answer">

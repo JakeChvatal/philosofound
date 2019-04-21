@@ -8,7 +8,7 @@ from flaskr.queries import has_duplicate_question, get_question_answers, create_
 import random
 
 bp = Blueprint('question', __name__)
-
+# gets an initial question page with a random question; the main view of our website
 @bp.route('/')
 @login_required
 def index():
@@ -35,6 +35,8 @@ def index():
 
     return render_template('questions/index.html', question = question, answers = answers)
 
+# allows the user to create a question by bringing up a create page and allowing submissions
+# notable that the user creating the question is also required to provide an answer to the question
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():

@@ -12,11 +12,15 @@
     <article class="question">
         <header>
             <div>
+                <!-- Displays information regarding the question asked-->
                 <h1>{{question['text'] }}</h1>
-                <h4># Responses: {{ answer_count }}</h4>
+                <h4>{{ answer_count }} Responses</h4>
+
+                <!-- Provides a menu for each user to view anonymous demograpic information for each answer -->
                 {% if answer != None %}
                 {% for answer in answers %}
-                    <h2>{{answer['text'] }}</h2>
+                
+                <h2>{{answer['text'] }}</h2>
                     <h3>Number of Responses: {{ answer['num_respondents'] }}</h3>
                     <form id="demographic" name="demographic" action="{{ url_for('answer.index_reloaded', chosen_answer=answer['answer_id']) }}" method="POST">
                         <label for="demographic">Select a Demographic for Above Answer</label>
@@ -29,13 +33,17 @@
                         </select>   
                         <input type="submit" value="View">
                     </form>
+
+                    <!-- Displays a table of demographic info data depending on what the user has elected to view-->
                     {% if demographic_info != None %}
+                        
                         {% if demographic_info[0]['answer_selected'] == answer['answer_id'] %}
                         <table>
                             <th>{{ demographic }}</th>
                             <th># Responses</th>
                             <th>% Responses</th>
                         {% endif %}
+
                         {% for demo in demographic_info %}
                             {% if answer['answer_id'] == demo['answer_selected'] %}
                             <tr>

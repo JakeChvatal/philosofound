@@ -45,4 +45,10 @@ def create_app(test_config=None):
     from . import answer
     app.register_blueprint(answer.bp)
 
+    from . import report
+    app.register_blueprint(report.bp)
+
+    from . import profile
+    app.register_blueprint(profile.bp)
+
     return app

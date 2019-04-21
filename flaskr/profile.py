@@ -6,8 +6,9 @@ from flaskr.auth import login_required
 from flaskr.db import get_db
 from flaskr.queries import get_question, get_question_answers, count_answers, get_demographic_info, has_duplicate_answer, has_duplicate_vote, create_answer
 
-bp = Blueprint('answer', __name__)
-# accepts a chosen answer, retrieving all of the associated questions and answers for it
+bp = Blueprint('profile', __name__)
+# provides a way to view the current user's profile with all of their questions and answers
+@login_required
 @bp.route('/profile/<int:user_id>', methods = ('POST','GET'))
 def profile(user_id):
     db = get_db()
