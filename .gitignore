@@ -18,3 +18,10 @@ build/
 env/
 dist/
 build/
+
+__pycache__/
+
+env/
+dist/
+build/
+lib/

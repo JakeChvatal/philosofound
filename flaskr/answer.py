@@ -1,6 +1,5 @@
 from flask import Blueprint, flash, g, redirect, render_template, request, url_for
 from werkzeug.exceptions import abort
-import sys
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
@@ -95,7 +94,6 @@ def create(questionId):
             ' VALUES (?, ?, ?)',
             (answer_text, questionId, g.user['user_id'])
         )
-
 
     if error is not None:
         flash(error)
