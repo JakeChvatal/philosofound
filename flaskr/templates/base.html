@@ -2,12 +2,13 @@
 <title>{% block title %}{% endblock %} - Philosofound</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
-  <h1>Philosofound</h1>
+    <h1>Philosofound</h1>
   <ul>
 
     <!-- Page header: offers the user different options regardless of their current page -->
     {% if g.user %}
       <li><span>{{ g.user['username'] }}</span>
+      <li><a href="{{ url_for('question.index') }}">Home</a>
       <li><a href="{{ url_for('profile.index', user_id=g.user['user_id']) }}">Profile</a>
       <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
     {% else %}

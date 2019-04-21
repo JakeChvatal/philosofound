@@ -17,7 +17,7 @@
                 <h4>{{ answer_count }} Responses</h4>
 
                 <!-- Provides a menu for each user to view anonymous demograpic information for each answer -->
-                {% if answer != None %}
+                {% if answers != None %}
                 {% for answer in answers %}
                 
                 <h2>{{answer['text'] }}</h2>

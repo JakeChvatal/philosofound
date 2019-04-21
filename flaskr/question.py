@@ -27,7 +27,6 @@ def index():
 
     question = None
     answers = None
-
     # gets random question if possible
     if questions != None and len(questions) != 0:
         question = questions[random.randint(0, len(questions) - 1)]
@@ -63,11 +62,8 @@ def create():
         else:
             question_id = create_question(db, question_text, g.user['user_id'])
             # if the question id was found, create an answer with it
-            if question_id is not None:
-                create_answer(db, question_id, g.user['user_id'], answer_text)
-                db.commit()
-            else:
-                None
+            create_answer(db, question_id, g.user['user_id'], answer_text)
+            db.commit()
 
             return redirect(url_for('question.index'))
 

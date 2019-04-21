@@ -8,6 +8,7 @@ from flaskr.db import get_db
 bp = Blueprint('report', __name__)
 
 # allows the user to report an answer
+# TODO: remove everything because of foreign key constraints
 @bp.route('/<int:answerId>/report', methods=('POST',))
 @login_required
 def report(answerId):

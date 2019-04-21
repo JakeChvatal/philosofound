@@ -10,20 +10,20 @@ bp = Blueprint('profile', __name__)
 # provides a way to view the current user's profile with all of their questions and answers
 @login_required
 @bp.route('/profile/<int:user_id>', methods = ('POST','GET'))
-def profile(user_id):
+def index(user_id):
     db = get_db()
     
     questions = db.execute(
         'SELECT *'
         ' FROM question'
-        ' WHERE user_id = ?',
+        ' WHERE author_id = ?',
         (user_id,)
     )
 
     answers = db.execute(
-        'SELECT q.text, q.id, a.text, a.id'
+        'SELECT q.text as question_text, q.question_id, a.text as answer_text, a.answer_id'
         ' FROM answer a JOIN question q on(a.question_id = q.question_id)'
-        ' WHERE user_id = ?',
+        ' WHERE a.author_id = ?',
         (user_id,)
     )
     

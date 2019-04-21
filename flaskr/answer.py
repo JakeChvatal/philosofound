@@ -27,7 +27,7 @@ def index(chosen_answer):
             demographic = None
 
         if demographic is not None and demographic != "Choose an option...":
-            demographic_info = get_demographic_info(chosen_answer, demographic)
+            demographic_info = get_demographic_info(db, chosen_answer, demographic)
 
     return render_template('answer/index.html', question = question, answers = answers, demographic = demographic, demographic_info = demographic_info, answer_count = answer_count)
 
@@ -52,11 +52,9 @@ def create(questionId):
     
     # if no error, adds an answer to the database
     else:
-        answer_id = create_answer(db, questionId, g.user['user_id'])    
+        answer_id = create_answer(db, questionId, g.user['user_id'], answer_text)    
         question = get_question(db, answer_id)
-        if question is not None:
-            answers = get_question_answers(db, question['question_id'])
-    
+        answers = get_question_answers(db, question['question_id'], g.user['user_id'])
     if error is not None:
         flash(error)
 

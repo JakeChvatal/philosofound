@@ -2,7 +2,7 @@
 # Accesses the question data associated with an Answer ID
 def get_question(db, answerId):
     question = db.execute(
-        'SELECT q.question_id as question_id, q.text'
+        'SELECT q.question_id, q.text'
         ' FROM question q JOIN answer a on(q.question_id = a.question_id)'
         ' WHERE a.answer_id = ?',
         (answerId,)
@@ -13,11 +13,11 @@ def get_question(db, answerId):
 # excludes answers that a user has reported
 def get_question_answers(db, questionId, userId):
     return db.execute(
-        'SELECT a.answer_id as answer_id, a.text, COUNT(c.answer_id) as num_respondents'
-        ' FROM answer a JOIN choose c on(a.answer_id = c.answer_id) JOIN report r ON(a.answer_id = r.answer_id)'
-        ' WHERE a.question_id = ? AND r.user_id != ?'
-        ' GROUP BY c.answer_id',
-        (questionId, userId)
+        'SELECT a.answer_id, a.text' #, COUNT(c.answer_id) as num_respondents'
+        ' FROM answer a JOIN choose c on(a.answer_id = c.answer_id)' # JOIN report r ON(a.answer_id = r.answer_id)'
+        ' WHERE a.question_id = ?' # AND r.user_id = ?'
+        , #' GROUP BY c.answer_id',
+        (questionId,)# userId)
     ).fetchall()
 
 # question.question_id -> Number
@@ -43,8 +43,7 @@ def times_answer_chosen(db, answerId):
 
 # answer.answer_id, demographic -> [demographic, num_responses, num_chose, percent_chose, answer_selected]
 # computes user statistics by demographic information for some answer and chosen demographic
-def get_demographic_info(answerId, demographic):
-    db = get_db()
+def get_demographic_info(db, answerId, demographic):
     num_responses = times_answer_chosen(db, answerId)
     if demographic in ["gender", "income", "party", "geography"]:
         return db.execute(
@@ -130,7 +129,7 @@ def create_question(db, question_text, user_id):
 
     # gets the id of the just-generated question
     return db.execute(
-        'SELECT question.question_id'
+        'SELECT question.question_id as question_id'
         ' FROM question'
         ' WHERE question.text = ?',
         (question_text,)

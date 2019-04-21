@@ -7,22 +7,23 @@ from flaskr.db import get_db
 
 bp = Blueprint('choose', __name__)
 
+# user selects an answer
 @bp.route('/<int:answerId>/choose', methods=('POST',))
 @login_required
 def choose(answerId):
     db = get_db()
     error = None
 
-    questionID = db.execute(
-        'SELECT question_id from answer where answer_id = ?;',
+    questionId = db.execute(
+        'SELECT a.question_id from answer a where a.answer_id = ?;',
         (answerId,)
     ).fetchone()['question_id']
 
     if db.execute(
             'SELECT c.user_id'
             ' FROM answer a join choose c on (a.answer_id = c.answer_id)'
-            ' where c.user_id = ? AND ? = a.question_id',
-        (g.user['user_id'], questionID)
+            ' where c.user_id = ? AND a.question_id = ?',
+        (g.user['user_id'], questionId)
         ).fetchone() is not None:
         error = "You've already voted for that question!"
 
@@ -34,13 +35,6 @@ def choose(answerId):
             ' VALUES (?, ?)',
             (g.user['user_id'], answerId)
         )
-    
-    questionId = db.execute(
-        'SELECT question_id'
-        ' FROM answer'
-        ' WHERE answer_id = ?',
-        (answerId,)
-    ).fetchone()['question_id']
 
     db.commit()
     return redirect(url_for('answer.index', chosen_answer = answerId))
