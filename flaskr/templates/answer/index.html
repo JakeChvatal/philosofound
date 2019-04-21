@@ -22,7 +22,7 @@
                 
                 <h2>{{answer['text'] }}</h2>
                     <h3>Number of Responses: {{ answer['num_respondents'] }}</h3>
-                    <form id="demographic" name="demographic" action="{{ url_for('answer.index_reloaded', chosen_answer=answer['answer_id']) }}" method="POST">
+                    <form id="demographic" name="demographic" action="{{ url_for('answer.index', chosen_answer=answer['answer_id']) }}" method="POST">
                         <label for="demographic">Select a Demographic for Above Answer</label>
                         <select name="{{ answer['answer_id'] }}" id="{{ answer['answer_id'] }}">
                             <option>Choose an option...</option>

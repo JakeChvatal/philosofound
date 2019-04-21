@@ -19,9 +19,9 @@ def report(answerId):
     if db.execute(
         'SELECT *'
         ' FROM report'
-        ' WHERE user_id = ?',
-        (g.user['user_id'],)
-    ) is not None:
+        ' WHERE user_id = ? AND answer_id = ?',
+        (g.user['user_id'], answerId)
+    ).fetchone() is not None:
         error = "You've already reported that answer."
     else:
         # if the answer has not been reported by the current user, add a report
@@ -42,7 +42,7 @@ def report(answerId):
             ' WHERE answer_id = ?'
             ' GROUP BY answer_id',
             (answerId,)
-        )['num_reports']
+        ).fetchone()['num_reports']
 
         # if the number of reports is high enough, the answer is removed and the report is removed
         if num_reports >= 10:

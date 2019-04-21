@@ -30,7 +30,15 @@ def index():
     # gets random question if possible
     if questions != None and len(questions) != 0:
         question = questions[random.randint(0, len(questions) - 1)]
-        answers = get_question_answers(db, question['question_id'], g.user['user_id'])
+        #answers = get_question_answers(db, question['question_id'], g.user['user_id'])
+
+        # TODO: figure out why this was not working
+        answers = db.execute(
+            'SELECT a.answer_id, a.text'
+            ' FROM answer a'
+            ' WHERE a.question_id = ?;',
+            (question['question_id'],)
+        )
 
     return render_template('questions/index.html', question = question, answers = answers)
 
@@ -52,17 +60,67 @@ def create():
         if not answer_text:
             error = 'Answer is required.'
 
-        if has_duplicate_question(db, question_text):
+        duplicate_question = db.execute(
+            'SELECT *'
+            ' FROM question'
+            ' WHERE question.text = ?',
+            (question_text,)
+        ).fetchone()
+
+        if duplicate_question is not None:
             error = "This question has already been asked by another user."
+
+        #TODO: figure out why this isn't working!
+        #if has_duplicate_question(db, question_text):
+        #    error = "This question has already been asked by another user."
 
         if error is not None:
             flash(error)
 
         # if no error, adds a question to the database
         else:
-            question_id = create_question(db, question_text, g.user['user_id'])
+            #question_id = create_question(db, question_text, g.user['user_id'])
             # if the question id was found, create an answer with it
-            create_answer(db, question_id, g.user['user_id'], answer_text)
+            #create_answer(db, question_id, g.user['user_id'], answer_text)
+            db.execute(
+                'INSERT INTO question (text, author_id)'
+                ' VALUES (?, ?)',
+                (question_text, g.user['user_id']),
+            )
+
+            #TODO: see if we can do better
+            # gets the id of the just-generated question
+            question_id = db.execute(
+                'SELECT question.question_id'
+                ' FROM question'
+                ' WHERE question.text = ?',
+                (question_text,)
+            ).fetchone()['question_id']
+
+            # if the question id was found, create an answer with it
+            if question_id is not None:
+                db.execute(
+                    'INSERT INTO answer (text, question_id, author_id)'
+                    ' VALUES (?, ?, ?)',
+                    (answer_text, question_id, g.user['user_id']),
+                )
+
+                answer_id = db.execute(
+                    'SELECT answer.answer_id'
+                    ' FROM answer'
+                    ' WHERE answer.text = ? AND answer.question_id = ?',
+                    (answer_text, question_id)
+                ).fetchone()['answer_id']
+
+                # user automatically chooses an answer they create
+                db.execute(
+                    'INSERT INTO choose (user_id, answer_id)'
+                    ' VALUES (?, ?)',
+                    (g.user['user_id'], answer_id)
+                )
+
+                db.commit()
+            
             db.commit()
 
             return redirect(url_for('question.index'))
