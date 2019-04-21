@@ -43,4 +43,4 @@ def choose(answerId):
     ).fetchone()['question_id']
 
     db.commit()
-    return redirect(url_for('answer.index', questionId = questionId))
+    return redirect(url_for('answer.index', chosen_answer = answerId))

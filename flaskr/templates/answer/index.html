@@ -12,12 +12,12 @@
     <article class="question">
         <header>
             <div><h1>{{question['text'] }}</h1>
-                
+                {% if answer != None %}
                 {% for answer in answers %}
                     <h2>{{answer['text'] }}</h2>
                     <form id="demographic" name="demographic" action="{{ url_for('answer.index_reloaded', chosen_answer=answer['answer_id']) }}" method="POST">
                         <label for="demographic">Select a Demographic for Above Answer</label>
-                        <select name="demographic" id="demographic">
+                        <select name="{{ answer['answer_id'] }}" id="{{ answer['answer_id'] }}">
                             <option>Choose an option...</option>
                             <option>gender</option>
                             <option>income</option>
@@ -32,15 +32,18 @@
                             <th># Responses</th>
                             <th>% Responses</th>
                         {% for demo in demographic_info %}
-                        <tr>
-                            <td>{{ demo['demographic'] }}</td>
-                            <td>{{ demo['num_chose'] }}</td>
-                            <td>{{ demo['percent_chose'] }}</td>
-                        </tr>
+                            {% if answer['answer_id'] == demo['answer_selected'] %}
+                            <tr>
+                                <td>{{ demo['demographic'] }}</td>
+                                <td>{{ demo['num_chose'] }}</td>
+                                <td>{{ demo['percent_chose'] }}</td>
+                            </tr>
+                            {% endif %}
                         {% endfor %}
                         </table>
                     {% endif %}
                 {% endfor %}
+                {% endif %}
             </div>
         </header>
     </article>

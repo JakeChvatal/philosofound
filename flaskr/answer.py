@@ -13,8 +13,8 @@ def index(chosen_answer):
     demographic_info = None
     
     question = db.execute(
-        'SELECT '
-        ' from question q JOIN answer a on(q.question_id = a.question_id)'
+        'SELECT q.question_id, q.text'
+        ' FROM question q JOIN answer a on(q.question_id = a.question_id)'
         ' WHERE a.answer_id = ?',
         (chosen_answer,)
     ).fetchone()
@@ -47,8 +47,8 @@ def index_reloaded(chosen_answer):
         ' WHERE a.question_id = ?;',
         (question['question_id'],)
     )
-    
-    demographic = request.form['demographic']
+
+    demographic = request.form[str(chosen_answer)]
     
     if demographic is not None and demographic != "Choose an option...":
        demographic_info = get_demographic_info(chosen_answer, demographic)
@@ -68,39 +68,39 @@ def get_demographic_info(answerId, demographic):
 
     if demographic == "gender":
         return db.execute(
-            'SELECT gender as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose'
+            'SELECT gender as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose, ? as answer_selected'
             ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
             ' WHERE answer_id = ?'
             ' GROUP BY ?'
             ' ORDER BY ?',
-            (num_responses, num_responses, answerId, demographic, demographic)
+            (num_responses, num_responses, answerId, answerId, demographic, demographic)
         ).fetchall()
     elif demographic == "income":
         return db.execute(
-            'SELECT income as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose'
+            'SELECT income as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose, ? as answer_selected'
             ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
             ' WHERE answer_id = ?'
             ' GROUP BY ?'
             ' ORDER BY ?',
-            (num_responses, num_responses, answerId, demographic, demographic)
+            (num_responses, num_responses, answerId, answerId, demographic, demographic)
         ).fetchall()
     elif demographic == "party":
         return db.execute(
-            'SELECT party as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose'
+            'SELECT party as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose, ? as answer_selected'
             ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
             ' WHERE answer_id = ?'
             ' GROUP BY ?'
             ' ORDER BY ?',
-            (num_responses, num_responses, answerId, demographic, demographic)
+            (num_responses, num_responses, answerId, answerId, demographic, demographic)
         ).fetchall()
     elif demographic == "geography":
         return db.execute(
-            'SELECT gender as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose'
+            'SELECT geography as demographic, ? as num_responses, COUNT(c.user_id) as num_chose, ((COUNT(c.user_id) * 100) / ?) as percent_chose, ? as answer_selected'
             ' FROM choose c JOIN user u on(c.user_id = u.user_id)'
             ' WHERE answer_id = ?'
             ' GROUP BY ?'
             ' ORDER BY ?',
-            (num_responses, num_responses, answerId, demographic, demographic)
+            (num_responses, num_responses, answerId, answerId, demographic, demographic)
         ).fetchall()
     else:
         return None
@@ -111,6 +111,10 @@ def create(questionId):
     answer_text = request.form['answer_text']
     error = None
     db = get_db()
+    
+    question = None
+    answers = None
+    
 
     # errors if a question is not supplied
     if not answer_text:
@@ -131,7 +135,6 @@ def create(questionId):
 
     # if no error, adds an answer to the database
     else:
-
         # creates a new answer
         db.execute(
             'INSERT INTO answer (text, question_id, author_id)'
@@ -152,7 +155,21 @@ def create(questionId):
             ' VALUES (?, ?)',
             (g.user['user_id'], answer_id)
         )
+
+        question = db.execute(
+            'SELECT q.question_id, q.text'
+            ' FROM question q JOIN answer a on(q.question_id = a.question_id)'
+            ' WHERE a.answer_id = ?',
+            (answer_id,)
+        ).fetchone()
+
+        answers = db.execute(
+            'SELECT a.answer_id, a.text'
+            ' FROM answer a'
+            ' WHERE a.question_id = ?;',
+            (question['question_id'],)
+        ).fetchall()
         
         db.commit()
 
-    return render_template('answer/index.html', question = question, answers = answers, demographic_info = demographic_info)
+    return render_template('answer/index.html', question = question, answers = answers)
