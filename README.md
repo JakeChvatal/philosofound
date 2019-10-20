@@ -7,4 +7,4 @@ To contribute, simply make an account then create a question. The question will 
 
 Other members can provide their own answers to questions or vote for current answers, then view anonymous analytics based on the demographics associated with other users.
 
-View the completed project at http://philosofound.com
+[Deprecated]: View the completed project at http://philosofound.com
